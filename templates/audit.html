@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BeyondCAPTCHA — Recent Verification Events</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Early Theme Resolver to prevent visual flash -->
+  <script>
+    (function() {
+      try {
+        var p = localStorage.getItem('beyondcaptcha-theme') || localStorage.getItem('bc_theme_pref') || 'system';
+        var r = (p === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : p;
+        document.documentElement.dataset.theme = r;
+        document.documentElement.dataset.themePreference = p;
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Central Design System Tokens & Base Theme -->
+  <link rel="stylesheet" href="/static/css/beyondcaptcha-theme.css">
+  <link rel="stylesheet" href="/static/css/beyondcaptcha-widget.css">
+  <link rel="stylesheet" href="/static/css/demo.css">
+  
+  <style>
+    body {
+      font-family: var(--bc-font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+      background-color: var(--bc-bg-page, #f8fafc);
+      margin: 0;
+      color: var(--bc-text-primary, #0f172a);
+      line-height: 1.5;
+    }
+    .audit-container {
+      max-width: 1040px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+    .audit-card {
+      background: var(--bc-bg-surface, #ffffff);
+      border-radius: 10px;
+      border: 1px solid var(--bc-border-subtle, #cbd5e1);
+      padding: 24px;
+      box-shadow: var(--bc-shadow-md, 0 4px 6px -1px rgba(0,0,0,0.05));
+    }
+    .audit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--bc-border-subtle, #cbd5e1);
+    }
+    .audit-title {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--bc-text-primary, #0f172a);
+    }
+    .audit-subtitle {
+      margin: 4px 0 0 0;
+      font-size: 13px;
+      color: var(--bc-text-muted, #64748b);
+    }
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn-filter {
+      background: var(--bc-bg-subtle, #f1f5f9);
+      border: 1px solid var(--bc-border-subtle, #cbd5e1);
+      color: var(--bc-text-primary, #0f172a);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-filter.active {
+      background: var(--bc-primary, #1d4ed8);
+      color: #ffffff;
+      border-color: var(--bc-primary, #1d4ed8);
+    }
+    .btn-refresh {
+      background: var(--bc-bg-surface, #ffffff);
+      border: 1px solid var(--bc-border-subtle, #cbd5e1);
+      color: var(--bc-text-primary, #0f172a);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-refresh:hover {
+      background: var(--bc-bg-subtle, #f1f5f9);
+    }
+    .events-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .events-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: var(--bc-bg-subtle, #f8fafc);
+      color: var(--bc-text-muted, #64748b);
+      font-weight: 700;
+      border-bottom: 2px solid var(--bc-border-subtle, #cbd5e1);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .events-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--bc-border-subtle, #e2e8f0);
+      vertical-align: middle;
+    }
+    .events-table tr:hover {
+      background-color: var(--bc-bg-subtle, #f8fafc);
+    }
+    .badge-decision {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .badge-allow {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .badge-reject {
+      background: rgba(239, 68, 68, 0.15);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .badge-challenge {
+      background: rgba(245, 158, 11, 0.15);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .badge-mode {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      background: var(--bc-bg-subtle, #f1f5f9);
+      color: var(--bc-text-muted, #475569);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Global Minimal Navigation Bar -->
+  <header class="citizen-header" role="banner">
+    <div class="header-inner">
+      <div class="brand-section">
+        <a href="/" class="brand-logo" aria-label="BeyondCAPTCHA Home">
+          <svg class="brand-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span>BeyondCAPTCHA</span>
+        </a>
+        <span class="brand-badge">
+          <span class="brand-badge-dot" aria-hidden="true"></span>
+          Audit View
+        </span>
+      </div>
+
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="/" class="nav-link">Demo</a>
+        <a href="/security-lab" class="nav-link">Security Lab</a>
+        <a href="/embed-demo" class="nav-link">Integration</a>
+        <a href="/audit" class="nav-link active" aria-current="page">Audit</a>
+
+        <!-- Accessible Theme Switcher -->
+        <div class="bc-theme-switcher" id="audit-theme-switcher"></div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="audit-container">
+    <main role="main">
+      <section class="audit-card" aria-labelledby="audit-heading">
+        <div class="audit-header">
+          <div>
+            <h1 id="audit-heading" class="audit-title">Recent Verification Events</h1>
+            <p class="audit-subtitle">Data-minimized telemetry audit log of recent human and bot verification events.</p>
+          </div>
+
+          <div class="filter-group">
+            <span style="font-size: 13px; font-weight: 600; color: var(--bc-text-muted);">Filter:</span>
+            <button type="button" class="btn-filter active" data-filter="all">All</button>
+            <button type="button" class="btn-filter" data-filter="ALLOW">Allow</button>
+            <button type="button" class="btn-filter" data-filter="REJECT">Reject</button>
+            <button type="button" class="btn-refresh" id="btn-refresh-logs">
+              <span>&#x21bb; Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="events-table" id="events-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Decision</th>
+                <th>Mode</th>
+                <th>Reason</th>
+                <th>Risk Score</th>
+                <th>Data-Minimized IP Hash</th>
+              </tr>
+            </thead>
+            <tbody id="events-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--bc-text-muted); padding: 24px;">
+                  Loading verification events...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 12px; color: var(--bc-text-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <span>Showing latest recorded sessions from local SQLite store</span>
+          <span>Salted SHA-256 IP hashes &bull; Zero sensitive form data</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/theme.js"></script>
+  <script>
+    (function() {
+      let currentFilter = 'all';
+      let allLogs = [];
+
+      function fetchLogs() {
+        // Authenticated Admin Audit Fetch using server-provided API key
+        fetch('/api/admin/logs?limit=50', {
+          headers: {
+            'X-Admin-Key': '{{ admin_api_key }}'
+          }
+        })
+          .then(res => {
+            if (!res.ok) {
+              throw new Error('HTTP ' + res.status + ' ' + res.statusText);
+            }
+            return res.json();
+          })
+          .then(data => {
+            allLogs = data.logs || [];
+            renderLogs();
+          })
+          .catch(err => {
+            console.error('Failed to load logs:', err);
+            const tbody = document.getElementById('events-tbody');
+            if (tbody) {
+              tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--bc-danger); padding: 20px;">Unable to load audit logs (' + err.message + '). Check server status.</td></tr>';
+            }
+          });
+      }
+
+      function renderLogs() {
+        const tbody = document.getElementById('events-tbody');
+        if (!tbody) return;
+
+        const filtered = allLogs.filter(item => {
+          if (currentFilter === 'all') return true;
+          const dec = (item.decision || '').toUpperCase();
+          if (currentFilter === 'REJECT') return dec === 'REJECT' || dec === 'BLOCK';
+          return dec === currentFilter;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--bc-text-muted); padding: 24px;">No verification events found for filter: ' + currentFilter + '.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(log => {
+          const dec = (log.decision || 'REJECT').toUpperCase();
+          let badgeClass = 'badge-reject';
+          let displayDec = '✕ REJECT';
+          if (dec === 'ALLOW') {
+            badgeClass = 'badge-allow';
+            displayDec = '✓ ALLOW';
+          } else if (dec === 'CHALLENGE' || dec === 'ACCESSIBILITY_VERIFY') {
+            badgeClass = 'badge-challenge';
+            displayDec = 'CHALLENGE';
+          }
+
+          const flow = log.flow_type || 'normal_passive';
+          const isA11y = flow.includes('access') || log.is_accessible_mode;
+          const modeLabel = isA11y ? 'Accessibility verification' : 'Normal verification';
+
+          return `<tr>
+            <td style="font-family: monospace; font-size: 12px; white-space: nowrap;">${log.created_at || '—'}</td>
+            <td><span class="badge-decision ${badgeClass}">${displayDec}</span></td>
+            <td><span class="badge-mode">${modeLabel}</span></td>
+            <td style="max-width: 320px;">${escapeHtml(log.reasons || log.reason || 'Normal verification')}</td>
+            <td style="font-family: monospace; font-weight: 700;">${Number(log.risk_score || 0).toFixed(1)}</td>
+            <td style="font-family: monospace; font-size: 11px; color: var(--bc-text-muted);">${escapeHtml(log.ip_hash || '—')}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      // Wire filter buttons
+      document.querySelectorAll('.btn-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.getAttribute('data-filter');
+          renderLogs();
+        });
+      });
+
+      document.getElementById('btn-refresh-logs').addEventListener('click', fetchLogs);
+
+      // Initial fetch
+      fetchLogs();
+    })();
+  </script>
+</body>
+</html>

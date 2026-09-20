@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BeyondCAPTCHA — Integration Demo</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Early Theme Resolver to prevent visual flash -->
+  <script>
+    (function() {
+      try {
+        var p = localStorage.getItem('beyondcaptcha-theme') || localStorage.getItem('bc_theme_pref') || 'system';
+        var r = (p === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : p;
+        document.documentElement.dataset.theme = r;
+        document.documentElement.dataset.themePreference = p;
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Central Design System Tokens & Base Theme -->
+  <link rel="stylesheet" href="/static/css/beyondcaptcha-theme.css">
+  <link rel="stylesheet" href="/static/css/beyondcaptcha-widget.css">
+  <link rel="stylesheet" href="/static/css/demo.css">
+  
+  <style>
+    body {
+      font-family: var(--bc-font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+      background-color: var(--bc-bg-page, #f8fafc);
+      margin: 0;
+      color: var(--bc-text-primary, #0f172a);
+      line-height: 1.5;
+    }
+    .wrapper {
+      max-width: 820px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+    .card {
+      background: var(--bc-bg-surface, #ffffff);
+      border-radius: 10px;
+      border: 1px solid var(--bc-border-subtle, #cbd5e1);
+      padding: 28px;
+      box-shadow: var(--bc-shadow-md, 0 4px 6px -1px rgba(0,0,0,0.05));
+      margin-bottom: 24px;
+    }
+    pre {
+      background: var(--bc-bg-subtle, #0b1120);
+      color: var(--bc-text-primary, #f8fafc);
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      border: 1px solid var(--bc-border-subtle, #cbd5e1);
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: var(--bc-text-primary, #0f172a);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--bc-border-main, #94a3b8);
+      border-radius: 6px;
+      font-size: 15px;
+      box-sizing: border-box;
+      min-height: 44px;
+      background: var(--bc-bg-surface, #ffffff);
+      color: var(--bc-text-primary, #0f172a);
+    }
+    .btn-submit {
+      background: var(--bc-primary, #1d4ed8);
+      color: white;
+      border: 1px solid var(--bc-primary, #1d4ed8);
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      min-height: 48px;
+      transition: background-color 0.15s;
+    }
+    .btn-submit:hover {
+      background: var(--bc-primary-hover, #1e40af);
+      border-color: var(--bc-primary-hover, #1e40af);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Global Minimal Navigation Bar (Section 18) -->
+  <header class="citizen-header" role="banner">
+    <div class="header-inner">
+      <div class="brand-section">
+        <a href="/" class="brand-logo" aria-label="BeyondCAPTCHA Home">
+          <svg class="brand-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span>BeyondCAPTCHA</span>
+        </a>
+        <span class="brand-badge">
+          <span class="brand-badge-dot" aria-hidden="true"></span>
+          Integration Demo
+        </span>
+      </div>
+
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="/" class="nav-link">Demo</a>
+        <a href="/security-lab" class="nav-link">Security Lab</a>
+        <a href="/embed-demo" class="nav-link active" aria-current="page">Integration</a>
+        <a href="/audit" class="nav-link">Audit</a>
+
+        <!-- Accessible Theme Switcher -->
+        <div class="bc-theme-switcher" id="embed-theme-switcher"></div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrapper">
+
+    <!-- 20. INTEGRATION DEMO (Section 20: Existing Form + Widget) -->
+    <main role="main">
+      <section class="card" aria-labelledby="live-demo-title">
+        <h1 id="live-demo-title" style="font-size: 1.25rem; margin-top: 0; font-weight: 700;">
+          Existing HTML Form + BeyondCAPTCHA Widget
+        </h1>
+        <p style="font-size: 14px; color: var(--bc-text-muted, #334155); margin-bottom: 20px;">
+          Below is a standard HTML web form protected by the BeyondCAPTCHA client SDK. The widget attaches seamlessly with passive verification for standard users and accessible mode when requested.
+        </p>
+
+        <form id="externalLoginForm" action="/api/health" method="GET">
+          <div class="form-group">
+            <label for="extEmail">Citizen Email / ID</label>
+            <input type="text" id="extEmail" name="email" placeholder="citizen@services.example" value="" required />
+          </div>
+          <div class="form-group">
+            <label for="extPass">Password</label>
+            <input type="password" id="extPass" name="password" placeholder="Enter password" value="" required />
+            <span style="font-size: 12px; color: var(--bc-text-muted); display: block; margin-top: 4px;">
+              DEMO ONLY: Enter any credentials
+            </span>
+          </div>
+
+          <!-- BeyondCAPTCHA Widget Mount Point -->
+          <div id="embed-widget-container" style="margin-bottom: 16px;"></div>
+
+          <button type="submit" class="btn-submit">
+            Continue to Service
+          </button>
+        </form>
+
+        <!-- Hidden Behind "[ View Integration Code ]" (Section 20 Requirement) -->
+        <details style="margin-top: 24px; border-top: 1px solid var(--bc-border-subtle); padding-top: 16px;">
+          <summary style="cursor: pointer; font-weight: 600; color: var(--bc-primary); font-size: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--bc-bg-page, #f1f5f9); border: 1px solid var(--bc-border-subtle, #cbd5e1); border-radius: 6px; user-select: none;">
+            <span>[ View Integration Code ]</span>
+          </summary>
+          <div style="margin-top: 16px;">
+            <p style="font-size: 13px; color: var(--bc-text-muted); margin-bottom: 8px;">
+              3-step integration into any existing web form:
+            </p>
+            <pre><code>&lt;!-- 1. Include Widget CSS &amp; JS --&gt;
+&lt;link rel="stylesheet" href="/static/css/beyondcaptcha-widget.css"&gt;
+&lt;script src="/static/js/beyondcaptcha-widget.js"&gt;&lt;/script&gt;
+
+&lt;!-- 2. Mount Container in Existing Form --&gt;
+&lt;form id="myForm" action="/submit" method="POST"&gt;
+  &lt;input type="text" name="username" /&gt;
+  &lt;input type="password" name="password" /&gt;
+  
+  &lt;!-- BeyondCAPTCHA widget container --&gt;
+  &lt;div id="beyondcaptcha-widget-mount"&gt;&lt;/div&gt;
+
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;!-- 3. Mount BeyondCAPTCHA SDK --&gt;
+&lt;script&gt;
+  BeyondCaptcha.mount('#myForm', {
+    apiUrl: '/api/verify'
+  });
+&lt;/script&gt;</code></pre>
+          </div>
+        </details>
+      </section>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/theme.js"></script>
+  <script src="/static/js/beyondcaptcha-widget.js"></script>
+  <script>
+    BeyondCaptcha.mount('#externalLoginForm', {
+      apiUrl: '/api/verify'
+    });
+  </script>
+</body>
+</html>

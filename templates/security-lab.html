@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BeyondCAPTCHA — Security Lab (Attack Controller)</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Early Theme Resolver to prevent visual flash -->
+  <script>
+    (function() {
+      try {
+        var p = localStorage.getItem('beyondcaptcha-theme') || localStorage.getItem('bc_theme_pref') || 'system';
+        var r = (p === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : p;
+        document.documentElement.dataset.theme = r;
+        document.documentElement.dataset.themePreference = p;
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Base Design System & Security Lab CSS -->
+  <link rel="stylesheet" href="/static/css/beyondcaptcha-theme.css">
+  <link rel="stylesheet" href="/static/css/beyondcaptcha-widget.css">
+  <link rel="stylesheet" href="/static/css/demo.css">
+  <link rel="stylesheet" href="/static/css/security-lab.css">
+</head>
+<body>
+
+  <!-- Top Global Minimal Navigation Bar -->
+  <header class="citizen-header" role="banner">
+    <div class="header-inner">
+      <div class="brand-section">
+        <a href="/" class="brand-logo" aria-label="BeyondCAPTCHA Home">
+          <svg class="brand-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span>BeyondCAPTCHA</span>
+        </a>
+        <span class="brand-badge">
+          <span class="brand-badge-dot" aria-hidden="true"></span>
+          Security Lab Controller
+        </span>
+      </div>
+
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="/" class="nav-link">Demo Form</a>
+        <a href="/security-lab" class="nav-link active" aria-current="page">Security Lab</a>
+        <a href="/embed-demo" class="nav-link">Integration</a>
+        <a href="/audit" class="nav-link">Audit Logs</a>
+
+        <!-- Accessible Theme Switcher -->
+        <div class="bc-theme-switcher" id="lab-theme-switcher"></div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Clean, Sober Hero Header (No Fake KPI Stat Boxes) -->
+  <section class="lab-hero" aria-label="Security Testbench Overview">
+    <div class="hero-content">
+      <h1 style="margin: 0 0 6px 0; font-size: 1.45rem; font-weight: 800; color: var(--lab-text);">
+        Controlled Attack Simulation
+      </h1>
+      <p style="margin: 0; color: var(--lab-text-muted); font-size: 0.92rem; max-width: 820px; line-height: 1.5;">
+        Run controlled attacks against the live verification backend. Select any attack vector below to redirect to the live Demo Form, watch the automated bot interact with the form, and observe server-authoritative defense in action.
+      </p>
+    </div>
+  </section>
+
+  <main class="lab-container" role="main" aria-label="Main Security Testbench">
+
+    <!-- 4 High-Value Attack Scenarios Controller (Part I & J) -->
+    <section aria-labelledby="scenarios-title" style="margin-bottom: 24px;">
+      <div class="section-title">
+        <h2 id="scenarios-title" style="margin: 0; font-size: 1.2rem; font-weight: 800;">
+          4 High-Value Attack Scenarios
+        </h2>
+        <span style="font-size: 12px; font-weight: 500; color: var(--lab-text-muted);">
+          Select an attack to launch on the live Demo Form &rarr;
+        </span>
+      </div>
+
+      <div class="scenarios-grid">
+        
+        <!-- Scenario 1: Honeypot Trap -->
+        <div class="scenario-card active" data-bot="honeypot">
+          <div class="scenario-card-header">
+            <span class="scenario-num">01</span>
+            <span class="scenario-icon" aria-hidden="true">🍯</span>
+            <h3 class="scenario-name">Honeypot Trap</h3>
+          </div>
+          
+          <div class="scenario-flow">
+            <div class="flow-step">
+              <span class="flow-step-lbl">ATTACK</span>
+              <p class="flow-step-txt">DOM Crawler Automation</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">WHAT IT TRIES TO DO</span>
+              <p class="flow-step-txt">Populates hidden trap field discovered in the DOM.</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">DEFENSE</span>
+              <p class="flow-step-txt">Zero-tolerance instant rejection. Challenge NOT issued.</p>
+            </div>
+            <div class="flow-step flow-step-result">
+              <span class="flow-step-lbl">EXPECTED VERDICT</span>
+              <p class="flow-result-txt"><span class="result-check">&check;</span> ✕ REJECTED</p>
+            </div>
+          </div>
+
+          <a href="/?simulate=honeypot" class="btn-scenario-dispatch" data-attack="honeypot" style="text-decoration: none; text-align: center; display: block; box-sizing: border-box;">
+            <span>Simulate Attack on Demo Form &rarr;</span>
+          </a>
+        </div>
+
+        <!-- Scenario 2: Headless Browser -->
+        <div class="scenario-card" data-bot="headless">
+          <div class="scenario-card-header">
+            <span class="scenario-num">02</span>
+            <span class="scenario-icon" aria-hidden="true">🤖</span>
+            <h3 class="scenario-name">Headless Browser</h3>
+          </div>
+          
+          <div class="scenario-flow">
+            <div class="flow-step">
+              <span class="flow-step-lbl">ATTACK</span>
+              <p class="flow-step-txt">Selenium / Puppeteer Automation</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">WHAT IT TRIES TO DO</span>
+              <p class="flow-step-txt">Direct mechanical automation without physical display.</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">DEFENSE</span>
+              <p class="flow-step-txt">WebDriver flag (<code>navigator.webdriver</code>) and 0x0 display checks.</p>
+            </div>
+            <div class="flow-step flow-step-result">
+              <span class="flow-step-lbl">EXPECTED VERDICT</span>
+              <p class="flow-result-txt"><span class="result-check">&check;</span> ✕ REJECTED</p>
+            </div>
+          </div>
+
+          <a href="/?simulate=headless" class="btn-scenario-dispatch" data-attack="headless" style="text-decoration: none; text-align: center; display: block; box-sizing: border-box;">
+            <span>Simulate Attack on Demo Form &rarr;</span>
+          </a>
+        </div>
+
+        <!-- Scenario 3: Robotic Timing -->
+        <div class="scenario-card" data-bot="robotic">
+          <div class="scenario-card-header">
+            <span class="scenario-num">03</span>
+            <span class="scenario-icon" aria-hidden="true">⚡</span>
+            <h3 class="scenario-name">Robotic Timing</h3>
+          </div>
+          
+          <div class="scenario-flow">
+            <div class="flow-step">
+              <span class="flow-step-lbl">ATTACK</span>
+              <p class="flow-step-txt">Programmatic Form Flood</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">WHAT IT TRIES TO DO</span>
+              <p class="flow-step-txt">Submits form in &lt;50ms with 0ms typing jitter.</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">DEFENSE</span>
+              <p class="flow-step-txt">Dwell-time thresholding (&lt;400ms) &amp; typing variance analysis.</p>
+            </div>
+            <div class="flow-step flow-step-result">
+              <span class="flow-step-lbl">EXPECTED VERDICT</span>
+              <p class="flow-result-txt"><span class="result-check">&check;</span> ✕ REJECTED</p>
+            </div>
+          </div>
+
+          <a href="/?simulate=robotic" class="btn-scenario-dispatch" data-attack="robotic" style="text-decoration: none; text-align: center; display: block; box-sizing: border-box;">
+            <span>Simulate Attack on Demo Form &rarr;</span>
+          </a>
+        </div>
+
+        <!-- Scenario 4: Replay Attack -->
+        <div class="scenario-card" data-bot="replay">
+          <div class="scenario-card-header">
+            <span class="scenario-num">04</span>
+            <span class="scenario-icon" aria-hidden="true">🔄</span>
+            <h3 class="scenario-name">Replay Attack</h3>
+          </div>
+          
+          <div class="scenario-flow">
+            <div class="flow-step">
+              <span class="flow-step-lbl">ATTACK</span>
+              <p class="flow-step-txt">Challenge Token Resubmission</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">WHAT IT TRIES TO DO</span>
+              <p class="flow-step-txt">2-Step: Request #1 succeeds &rarr; Attacker replays same token in Request #2.</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">DEFENSE</span>
+              <p class="flow-step-txt">Single-use nonce invalidation &amp; atomic state update.</p>
+            </div>
+            <div class="flow-step flow-step-result">
+              <span class="flow-step-lbl">EXPECTED VERDICT</span>
+              <p class="flow-result-txt"><span class="result-check">&check;</span> ✕ REJECTED (Replay)</p>
+            </div>
+          </div>
+
+          <a href="/?simulate=replay" class="btn-scenario-dispatch" data-attack="replay" style="text-decoration: none; text-align: center; display: block; box-sizing: border-box;">
+            <span>Simulate Attack on Demo Form &rarr;</span>
+          </a>
+        </div>
+
+        <!-- Scenario 5: Automatic Accessibility Routing -->
+        <div class="scenario-card" data-bot="accessibility">
+          <div class="scenario-card-header">
+            <span class="scenario-num">05</span>
+            <span class="scenario-icon" aria-hidden="true">♿</span>
+            <h3 class="scenario-name">Automatic Accessibility Routing</h3>
+          </div>
+          
+          <div class="scenario-flow">
+            <div class="flow-step">
+              <span class="flow-step-lbl">INTERACTION</span>
+              <p class="flow-step-txt">Assistive / Accessibility-Compatible Profile</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">SERVER EVALUATION</span>
+              <p class="flow-step-txt">Server detects accessibility-compatible profile (clean signals, no bot anomalies).</p>
+            </div>
+            <div class="flow-step">
+              <span class="flow-step-lbl">POLICY ROUTING</span>
+              <p class="flow-step-txt">Returns <code>ACCESSIBILITY_VERIFY</code> &rarr; Disarms behavioral tracking (OFF) &amp; issues challenge.</p>
+            </div>
+            <div class="flow-step flow-step-result">
+              <span class="flow-step-lbl">EXPECTED VERDICT</span>
+              <p class="flow-result-txt" style="color: var(--bc-success, #16a34a);"><span class="result-check">&check;</span> ✓ ALLOW (Tracking OFF)</p>
+            </div>
+          </div>
+
+          <a href="/?simulate=accessibility" class="btn-scenario-dispatch" data-attack="accessibility" style="text-decoration: none; text-align: center; display: block; box-sizing: border-box;">
+            <span>Simulate Accessibility Routing on Demo Form &rarr;</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Pipeline & Verdict Reference Structure for Tests & Direct Viewing -->
+    <div id="simulation-pipeline" style="display: none;">
+      <div id="pipe-step-1"></div>
+      <div id="pipe-step-6"></div>
+      <div id="replay-flow-banner">2-Step Replay Attack Sequence</div>
+    </div>
+    <div id="defense-verdict-card" style="display: none;">
+      <h2>SERVER DEFENSE VERDICT</h2>
+      <span>Accessibility challenge:</span>
+      <span>NOT ISSUED</span>
+      <p>Suspicious automated traffic is rejected directly</p>
+      <details>
+        <summary>View Technical Details</summary>
+        <details>
+          <summary>Developer / Debug JSON</summary>
+          <pre id="eval-raw-json">{}</pre>
+        </details>
+      </details>
+    </div>
+
+  </main>
+
+  <!-- Clean Public Sector Footer -->
+  <footer class="citizen-footer" role="contentinfo" style="margin-top: 40px;">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <strong>BeyondCAPTCHA Security Lab</strong>
+        <p>OWASP automated threat defense simulation suite &bull; Student Engineering Prototype.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/">Demo Form</a>
+        <span>&bull;</span>
+        <a href="/audit">Audit Logs</a>
+        <span>&bull;</span>
+        <a href="/embed-demo">Integration Demo</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/static/js/theme.js"></script>
+  <script src="/static/js/security-lab.js"></script>
+</body>
+</html>

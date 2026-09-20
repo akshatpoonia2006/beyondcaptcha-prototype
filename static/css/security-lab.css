@@ -1,0 +1,397 @@
+/* ==========================================================================
+   BeyondCAPTCHA Security Lab — Student Testbench Stylesheet
+   Direct, clean, technical testing laboratory layout
+   ========================================================================== */
+
+:root {
+  --lab-bg: var(--bc-bg-page, #f8fafc);
+  --lab-card-bg: var(--bc-bg-surface, #ffffff);
+  --lab-card-inner: var(--bc-bg-subtle, #f1f5f9);
+  --lab-text: var(--bc-text-primary, #0f172a);
+  --lab-text-muted: var(--bc-text-muted, #64748b);
+  --lab-border: var(--bc-border-subtle, #e2e8f0);
+  --lab-primary: var(--bc-primary, #1d4ed8);
+  --lab-success: var(--bc-success, #16a34a);
+  --lab-danger: var(--bc-danger, #dc2626);
+}
+
+.lab-hero {
+  background: var(--lab-card-bg);
+  border-bottom: 1px solid var(--lab-border);
+  padding: 20px 20px 16px 20px;
+}
+
+.hero-content {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.lab-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* ==========================================================================
+   4 SCENARIOS 2x2 GRID
+   ========================================================================== */
+.scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.scenario-card {
+  background: var(--lab-card-bg);
+  border: 1px solid var(--lab-border);
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+
+.scenario-card:hover {
+  border-color: var(--lab-primary);
+}
+
+.scenario-card.active {
+  border-color: var(--lab-primary);
+  background: var(--lab-card-inner);
+  box-shadow: 0 0 0 1px var(--lab-primary);
+}
+
+.scenario-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--lab-border);
+}
+
+.scenario-num {
+  font-family: var(--bc-font-mono, monospace);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--lab-primary);
+  background: var(--bc-primary-light, #eff6ff);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.scenario-icon {
+  font-size: 18px;
+}
+
+.scenario-name {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--lab-text);
+}
+
+.scenario-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11.5px;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.flow-step-lbl {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--lab-text-muted);
+  letter-spacing: 0.04em;
+}
+
+.flow-step-txt {
+  margin: 0;
+  color: var(--lab-text);
+  line-height: 1.35;
+}
+
+.flow-step-result {
+  background: rgba(220, 38, 38, 0.08);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.flow-result-txt {
+  margin: 0;
+  font-weight: 800;
+  color: var(--lab-danger);
+}
+
+.flow-reason-txt {
+  font-weight: 600;
+  color: var(--lab-text-muted);
+}
+
+.btn-scenario-dispatch {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--lab-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  min-height: 36px;
+}
+
+.btn-scenario-dispatch:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   SIMULATION PIPELINE & CONSOLE
+   ========================================================================== */
+.simulation-pipeline-card {
+  background: var(--lab-card-bg);
+  border: 1px solid var(--lab-border);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.simulation-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--lab-border);
+  font-size: 12px;
+}
+
+.pipeline-status {
+  font-weight: 700;
+  color: var(--lab-primary);
+}
+
+.pipeline-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 768px) {
+  .pipeline-steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pipe-step {
+  background: var(--lab-card-inner);
+  border: 1px solid var(--lab-border);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 11px;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+}
+
+.pipe-step.step-active {
+  opacity: 1;
+  border-color: var(--lab-primary);
+  background: rgba(29, 78, 216, 0.08);
+  box-shadow: 0 0 0 1px var(--lab-primary);
+}
+
+.pipe-step.step-done {
+  opacity: 0.95;
+  border-color: var(--lab-border);
+}
+
+.pipe-num {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--lab-text-muted);
+}
+
+.pipe-desc {
+  display: block;
+  font-weight: 700;
+  color: var(--lab-text);
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   SERVER DEFENSE VERDICT CARD
+   ========================================================================== */
+.server-defense-verdict-card {
+  background: var(--lab-card-bg);
+  border: 1px solid var(--lab-border);
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.verdict-card-header {
+  margin-bottom: 14px;
+}
+
+.verdict-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.verdict-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--lab-text);
+}
+
+.verdict-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.verdict-rejected {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--lab-danger);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.verdict-allowed {
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--lab-success);
+  border: 1px solid rgba(22, 163, 74, 0.3);
+}
+
+.verdict-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.verdict-meta-item {
+  background: var(--lab-card-inner);
+  border: 1px solid var(--lab-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.verdict-meta-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--lab-text-muted);
+  display: block;
+}
+
+.verdict-meta-val {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.verdict-section {
+  margin-top: 12px;
+}
+
+.verdict-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--lab-text-muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.verdict-why-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--lab-text);
+}
+
+.a11y-not-issued-callout {
+  background: rgba(220, 38, 38, 0.06);
+  border-left: 3px solid var(--lab-danger);
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-top: 14px;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.control-item-card {
+  background: var(--lab-card-inner);
+  border: 1px solid var(--lab-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+/* Signals Breakdown Table */
+.signals-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+
+.signals-breakdown-table th {
+  background: var(--lab-card-inner);
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--lab-border);
+  font-weight: 700;
+  color: var(--lab-text-muted);
+}
+
+.signals-breakdown-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--lab-border);
+}
+
+#eval-raw-json {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: var(--bc-font-mono, monospace);
+  max-height: 240px;
+  overflow: auto;
+  line-height: 1.35;
+  margin: 6px 0 0 0;
+}

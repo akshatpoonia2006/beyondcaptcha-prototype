@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BeyondCAPTCHA — Human verification, without the accessibility barrier</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Early Theme Resolver to prevent visual flash -->
+  <script>
+    (function() {
+      try {
+        var p = localStorage.getItem('beyondcaptcha-theme') || localStorage.getItem('bc_theme_pref') || 'system';
+        var r = (p === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : p;
+        document.documentElement.dataset.theme = r;
+        document.documentElement.dataset.themePreference = p;
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Central Design System Tokens & Student Prototype CSS -->
+  <link rel="stylesheet" href="/static/css/beyondcaptcha-theme.css">
+  <link rel="stylesheet" href="/static/css/beyondcaptcha-widget.css">
+  <link rel="stylesheet" href="/static/css/demo.css">
+</head>
+<body>
+
+  <!-- Skip link for keyboard navigation (WCAG SC 2.4.1) -->
+  <a href="#main-content" class="bc-skip-link">Skip to main content</a>
+
+  <!-- Accessible Screen Reader Announcer for Live Attack Simulation (WCAG SC 4.1.3) -->
+  <div id="simulation-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Dedicated Viewport Overlay for Attack Simulation (Section 5) -->
+  <div id="attack-simulation-overlay" class="attack-simulation-overlay" aria-hidden="true" style="display: none;">
+    <div id="simulated-cursor" class="simulated-cursor">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 3L18 12L11.5 13.5L15 21L12 22.5L8.5 15L4 18V3Z" fill="#2563eb" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      <span class="cursor-label" id="cursor-label">Bot</span>
+    </div>
+  </div>
+
+  <div class="bc-page-wrapper">
+    <!-- Top Minimal Navigation Bar -->
+    <header class="citizen-header" role="banner">
+      <div class="header-inner">
+        <div class="brand-section">
+          <a href="/" class="brand-logo" aria-label="BeyondCAPTCHA Home">
+            <svg class="brand-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>BeyondCAPTCHA</span>
+          </a>
+          <span class="brand-badge">
+            <span class="brand-badge-dot" aria-hidden="true"></span>
+            SIH B.Tech Prototype
+          </span>
+        </div>
+
+        <nav class="header-nav" aria-label="Main Navigation">
+          <a href="/" class="nav-link active" aria-current="page">Demo Form</a>
+          <a href="/security-lab" class="nav-link">Security Lab</a>
+          <a href="/embed-demo" class="nav-link">Integration</a>
+          <a href="/audit" class="nav-link">Audit Logs</a>
+
+          <!-- Accessible Theme Switcher (System / Light / Dark) -->
+          <div class="bc-theme-switcher" id="global-theme-switcher"></div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- CONTROLLED ATTACK SIMULATION TOP BANNER (Part L — Visible only during attack mode) -->
+    <div class="simulation-banner" id="simulation-banner" style="display: none;" role="alert">
+      <div class="sim-banner-inner">
+        <div class="sim-banner-left">
+          <span class="sim-badge">CONTROLLED ATTACK SIMULATION</span>
+          <strong class="sim-attack-title" id="sim-attack-title">Attack: Headless Browser</strong>
+        </div>
+        <div class="sim-banner-right">
+          <span class="sim-status-pill" id="sim-status-pill">Active on visible form</span>
+          <a href="/" class="btn-exit-sim" id="btn-exit-sim">Exit Simulation</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Project Overview Hero -->
+    <section class="hero-section" id="hero-overview-section" aria-label="Platform Overview">
+      <div class="hero-inner overview-content" id="hero-overview-content">
+        
+        <h1 class="hero-title">
+          BeyondCAPTCHA: <span class="hero-title-highlight">Human verification, without the accessibility barrier.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          An accessibility-first verification layer for web forms. Developed by our B.Tech engineering team as a working cybersecurity prototype for the Smart India Hackathon.
+        </p>
+        
+        <div class="hero-cta-group">
+          <a href="#main-content" class="btn-hero btn-hero-primary">
+            Try Live Demo
+          </a>
+          <a href="/security-lab" class="btn-hero btn-hero-secondary">
+            Explore Security Lab
+          </a>
+        </div>
+
+        <!-- 3 Technical Architecture Flow Cards -->
+        <div class="architecture-paths-wrapper" aria-label="Simple Architecture Flow">
+          <div class="paths-grid">
+            <!-- Path 1: NORMAL -->
+            <div class="path-card path-card-passive">
+              <div class="path-card-header">
+                <h2 class="path-card-title">NORMAL</h2>
+                <span class="path-badge path-badge-allow">ALLOW</span>
+              </div>
+              <div class="path-card-flow">Passive verification &rarr; ALLOW</div>
+              <p class="path-card-desc">
+                Natural typing cadence and mouse curvature evaluated seamlessly without visual puzzles.
+              </p>
+            </div>
+
+            <!-- Path 2: ACCESSIBILITY -->
+            <div class="path-card path-card-a11y">
+              <div class="path-card-header">
+                <h2 class="path-card-title">ACCESSIBILITY</h2>
+                <span class="path-badge path-badge-allow">ALLOW</span>
+              </div>
+              <div class="path-card-flow">Tracking OFF &rarr; Accessible verification &rarr; ALLOW</div>
+              <p class="path-card-desc">
+                Behavioral tracking is completely disabled. Simple cognitive challenge with screen reader support.
+              </p>
+            </div>
+
+            <!-- Path 3: BOT -->
+            <div class="path-card path-card-bot">
+              <div class="path-card-header">
+                <h2 class="path-card-title">BOT</h2>
+                <span class="path-badge path-badge-reject">REJECT</span>
+              </div>
+              <div class="path-card-flow">Risk detection &rarr; REJECT</div>
+              <p class="path-card-desc">
+                Honeypot trap fields and WebDriver automation flags rejected directly with zero challenge fallback.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MAIN DEMO TESTBENCH (Two-column layout: Form on Left, Live Engine & Simulation Panel on Right) -->
+    <main class="portal-main demo-target-container" id="main-content" role="main">
+      <div class="portal-container">
+        
+        <!-- Left: Citizen Services Demo Form (The actual attack target!) -->
+        <section class="portal-card demo-form-section" id="form-card-container" aria-labelledby="portal-card-title">
+          <div class="card-header">
+            <div class="emblem-wrapper" aria-hidden="true">
+              <svg class="gov-emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="card-title" id="portal-card-title">Citizen Services Portal</h2>
+              <p class="card-desc">Neutral Demo Public Service Sign-In</p>
+            </div>
+          </div>
+
+          <!-- The Visible Normal Web Form -->
+          <form id="citizenLoginForm" autocomplete="on">
+            <div class="form-group">
+              <label for="usernameInput" class="form-label">
+                <span>Username / Email</span>
+              </label>
+              <input type="text" id="usernameInput" name="username" class="form-input" placeholder="citizen@services.example" value="" required />
+            </div>
+
+            <div class="form-group">
+              <label for="passwordInput" class="form-label">
+                <span>Password</span>
+              </label>
+              <input type="password" id="passwordInput" name="password" class="form-input" placeholder="Enter your password" value="" required />
+              <span class="form-helper-text" style="display:block; font-size:11px; color:var(--bc-text-muted); margin-top:3px;">
+                DEMO ONLY: Enter any test credentials
+              </span>
+            </div>
+
+            <!-- Controlled indicator for honeypot interaction (Part O) -->
+            <div id="honeypot-interaction-indicator" class="honeypot-trap-indicator" style="display: none;" role="status">
+              <span aria-hidden="true">🍯</span>
+              <span><strong>Hidden Trap Field Interaction:</strong> Honeypot input was discovered and populated by crawler.</span>
+            </div>
+
+            <!-- BeyondCAPTCHA Widget Mount Container -->
+            <div id="beyondcaptcha-widget-mount" class="widget-mount-point"></div>
+
+            <button type="submit" id="mainSubmitBtn" class="btn-submit-citizen">
+              Continue
+            </button>
+
+            <!-- Student Demo Helper Tools -->
+            <div class="card-footer-controls">
+              <button type="button" id="btn-trigger-a11y" class="btn-link-a11y">
+                <span aria-hidden="true">♿</span> Use accessible verification
+              </button>
+              
+              <div class="test-helpers-row">
+                <button type="button" id="btn-simulate-typing" class="btn-link-subtle" title="Types realistic credentials into form">
+                  ⌨️ Simulate Natural Typing
+                </button>
+                <button type="button" id="btn-trigger-bot-hp" class="btn-link-subtle" title="Fills hidden honeypot trap to demonstrate bot rejection">
+                  🤖 Test Bot Honeypot Trap
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <div class="privacy-guarantee-banner">
+            <svg class="privacy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span><strong>Data-Minimized Telemetry:</strong> Salted SHA-256 IP hashing, zero sensitive form inputs or passwords stored.</span>
+          </div>
+        </section>
+
+        <!-- Right: Verification Engine Live Status & Output Panel -->
+        <section class="security-accordion-container" id="security-details-section" aria-label="Security Verification Status">
+          
+          <div class="engine-status-card">
+            <div class="engine-status-header">
+              <span class="engine-title">
+                <span class="live-pulse" aria-hidden="true"></span>
+                Verification Engine Live Status
+              </span>
+              <span style="font-size: 11px; font-family: var(--bc-font-mono); color: var(--bc-text-muted);">
+                POST /api/verify
+              </span>
+            </div>
+
+            <!-- Live Status Summary Banner -->
+            <div class="status-summary-banner banner-waiting" id="status-summary-banner" role="status">
+              <div class="banner-icon-wrap" id="banner-icon-wrap">
+                <span aria-hidden="true">&#x25CB;</span>
+              </div>
+              <div class="banner-text-wrap">
+                <strong class="banner-headline" id="banner-headline">Waiting for verification</strong>
+                <span class="banner-subline" id="banner-subline">Complete form or choose accessible verification</span>
+              </div>
+              <div class="banner-latency" id="banner-latency">&mdash;</div>
+            </div>
+
+            <!-- Live Simulation Activity Panel (Requirement 8 — Live state machine activity) -->
+            <div class="simulation-activity-card" id="simulation-activity-panel" style="display: none; margin-bottom: 14px;" role="status">
+              <div class="activity-card-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="activity-badge">CONTROLLED ATTACK SIMULATION</span>
+                  <span class="activity-state-pill" id="activity-state-pill">ACTIVE</span>
+                </div>
+                <div class="activity-attack-title" id="activity-attack-name">Attack: Headless Browser</div>
+              </div>
+              <div class="activity-card-body">
+                <div class="activity-row">
+                  <span class="activity-label">Current Activity:</span>
+                  <strong class="activity-val" id="activity-current-text">Initializing simulation...</strong>
+                </div>
+                <div class="activity-row" style="margin-top: 6px;">
+                  <span class="activity-label">Current Action:</span>
+                  <strong class="activity-val" id="sim-current-action">Initializing...</strong>
+                </div>
+                <div class="sim-progress-box" style="margin-top: 8px;">
+                  <span style="font-size: 10px; font-weight: 800; color: var(--bc-text-muted); text-transform: uppercase;">Progress:</span>
+                  <div id="sim-progress-steps" class="sim-progress-steps">
+                    <span id="sim-step-0" class="sim-prog-step pending">○ Targeted</span>
+                    <span id="sim-step-1" class="sim-prog-step pending">○ Username entered</span>
+                    <span id="sim-step-2" class="sim-prog-step pending">○ Password typing</span>
+                    <span id="sim-step-3" class="sim-prog-step pending">○ Submit</span>
+                    <span id="sim-step-4" class="sim-prog-step pending">○ Server defense</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 8-STAGE TIMELINE PANEL (Part S & T — Visible during attack simulation) -->
+            <div class="simulation-pipeline-card" id="simulation-pipeline" style="display: none; margin-bottom: 14px;">
+              <div class="simulation-panel-header">
+                <div>
+                  <span style="font-size: 10px; font-weight: 800; color: var(--bc-text-muted); text-transform: uppercase;">Simulation Timeline:</span>
+                  <span id="pipeline-status-text" style="font-size: 11px; font-weight: 700; color: var(--bc-primary); margin-left: 6px;">Initializing...</span>
+                </div>
+              </div>
+
+              <!-- 2-Step Replay Sequence Callout (Part R) -->
+              <div id="replay-flow-banner" style="display: none; margin-bottom: 10px; padding: 10px 12px; background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25); border-radius: 6px;">
+                <div style="font-size: 10px; font-weight: 800; color: var(--bc-primary); text-transform: uppercase; margin-bottom: 4px;">
+                  2-Step Replay Attack Sequence:
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; flex-wrap: wrap;">
+                  <span id="replay-step-1-badge" style="padding: 3px 8px; border-radius: 4px; background: var(--bc-bg-surface); border: 1px solid var(--bc-border-subtle); font-weight: 600;">
+                    Request #1: Valid Challenge Solve &rarr; <strong style="color: var(--bc-success);">✓ ALLOW</strong> (Nonce Consumed)
+                  </span>
+                  <span aria-hidden="true">&rarr;</span>
+                  <span id="replay-step-2-badge" style="padding: 3px 8px; border-radius: 4px; background: var(--bc-bg-surface); border: 1px solid var(--bc-border-subtle); font-weight: 600;">
+                    Request #2: Attacker Replays Token &rarr; <strong style="color: var(--bc-danger);">✕ REJECT</strong> (Anti-Replay Violation)
+                  </span>
+                </div>
+              </div>
+
+              <!-- 8-Stage Timeline Grid (Part T) -->
+              <div class="pipeline-steps-grid">
+                <div class="pipe-step" id="pipe-step-1">
+                  <span class="pipe-num">1</span>
+                  <span class="pipe-desc">Attacker Init</span>
+                </div>
+                <div class="pipe-step" id="pipe-step-2">
+                  <span class="pipe-num">2</span>
+                  <span class="pipe-desc">Target Form</span>
+                </div>
+                <div class="pipe-step" id="pipe-step-3">
+                  <span class="pipe-num">3</span>
+                  <span class="pipe-desc">Interaction</span>
+                </div>
+                <div class="pipe-step" id="pipe-step-4">
+                  <span class="pipe-num">4</span>
+                  <span class="pipe-desc">Request Sent</span>
+                </div>
+                <div class="pipe-step" id="pipe-step-5">
+                  <span class="pipe-num">5</span>
+                  <span class="pipe-desc">Inspecting</span>
+                </div>
+                <div class="pipe-step" id="pipe-step-6">
+                  <span class="pipe-num">6</span>
+                  <span class="pipe-desc">Risk Evaluated</span>
+                </div>
+                <div class="pipe-step" id="pipe-step-7">
+                  <span class="pipe-num">7</span>
+                  <span class="pipe-desc">Decision</span>
+                </div>
+                <div class="pipe-step" id="pipe-step-8">
+                  <span class="pipe-num">8</span>
+                  <span class="pipe-desc" id="pipe-step-8-text">Rejected</span>
+                </div>
+              </div>
+
+              <!-- Robotic Action Stream (Part Q) -->
+              <div id="robotic-action-stream" style="display: none; margin-top: 10px; font-family: var(--bc-font-mono); font-size: 11px; background: var(--bc-bg-subtle); padding: 8px 10px; border-radius: 4px; border: 1px solid var(--bc-border-subtle);">
+                <div style="font-weight: 800; font-size: 10px; color: var(--bc-text-muted); text-transform: uppercase; margin-bottom: 4px;">Automated Action Stream:</div>
+                <div id="robotic-actions-log" style="line-height: 1.4; color: var(--bc-text-primary);">Awaiting actions...</div>
+              </div>
+            </div>
+
+            <!-- PROMINENT HUMAN-READABLE WARNING (Part U & Requirement 15 — Visible after attack simulation) -->
+            <div class="attack-warning-card" id="attack-warning-card" style="display: none; margin-bottom: 14px;" role="alert">
+              <div class="warning-header">
+                <span class="warning-icon" aria-hidden="true">⚠️</span>
+                <div class="warning-title-wrap">
+                  <h3 class="warning-title" id="warning-title">Suspicious Automated Activity Detected</h3>
+                  <span class="warning-subtitle" id="warning-subtitle">Attack Type: Headless Browser</span>
+                </div>
+                <span class="warning-badge-reject" id="warning-decision-badge">✕ REJECT</span>
+              </div>
+              
+              <div class="warning-body">
+                <!-- Cause & Behavior Summary (Requirement 15) -->
+                <div class="warning-field-rows" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-bottom: 10px; padding: 8px 10px; background: rgba(0,0,0,0.03); border-radius: 4px; border: 1px solid var(--bc-border-subtle);">
+                  <div>
+                    <span style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--bc-text-muted);">Attack Type:</span>
+                    <strong id="warning-attack-type-val" style="font-size: 12px; color: var(--bc-text-primary);">Headless Browser</strong>
+                  </div>
+                  <div>
+                    <span style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--bc-text-muted);">Decision:</span>
+                    <strong style="font-size: 12px; color: var(--bc-danger);">REJECT</strong>
+                  </div>
+                  <div>
+                    <span style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--bc-text-muted);">Detected Behavior:</span>
+                    <span id="warning-detected-behavior" style="font-size: 12px; font-weight: 600; color: var(--bc-text-primary);">Automated browser behavior</span>
+                  </div>
+                </div>
+
+                <div class="warning-reasons-box">
+                  <strong style="font-size: 11px; text-transform: uppercase; color: var(--bc-text-muted);">Server Evidence:</strong>
+                  <ul id="warning-reasons-list" style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px; line-height: 1.45;">
+                    <li>Automated browser detected</li>
+                  </ul>
+                </div>
+                
+                <!-- Accessibility Challenge: NOT ISSUED Callout (Part U) -->
+                <div class="a11y-not-issued-callout">
+                  <div class="a11y-not-issued-header">
+                    <strong style="font-size: 11px; color: var(--bc-danger);">Accessibility challenge:</strong>
+                    <span class="badge-not-issued">NOT ISSUED</span>
+                  </div>
+                  <p style="margin: 4px 0 0 0; font-size: 11px; color: var(--bc-text-muted); line-height: 1.4;">
+                    Suspicious automated traffic is rejected directly rather than being routed to the accessible challenge. Accessibility is not a second-chance path for bots.
+                  </p>
+                </div>
+                
+                <!-- Expandable Human Explanation -->
+                <details class="why-detected-fold" style="margin-top: 8px;">
+                  <summary style="font-size: 11px; font-weight: 700; color: var(--bc-primary); cursor: pointer;">Why was this detected?</summary>
+                  <p id="warning-explanation-text" style="margin: 6px 0 0 0; font-size: 11.5px; color: var(--bc-text-secondary); line-height: 1.45;">
+                    The server evaluated the incoming interaction signals against strict deterministic security controls. Automated signatures were identified and intercepted directly.
+                  </p>
+                </details>
+              </div>
+            </div>
+
+            <!-- SERVER DEFENSE VERDICT CARD (Part V) -->
+            <div class="server-defense-verdict-card" id="defense-verdict-card">
+              <div class="verdict-card-header">
+                <div class="verdict-header-row">
+                  <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--bc-text-muted);">SERVER DEFENSE VERDICT</span>
+                  <span class="verdict-badge" id="defense-verdict-badge" style="font-size: 11px;">PENDING</span>
+                </div>
+              </div>
+
+              <!-- Technical Metrics Grid -->
+              <div class="security-meta-grid">
+                <div class="meta-item">
+                  <span class="meta-label">Decision</span>
+                  <strong class="meta-val" id="meta-decision" style="color: var(--bc-text-muted);">PENDING</strong>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Risk Score</span>
+                  <strong class="meta-val" id="meta-risk" style="color: var(--bc-text-muted);">--</strong>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Confidence</span>
+                  <strong class="meta-val" id="meta-confidence" style="color: var(--bc-text-muted);">HIGH</strong>
+                </div>
+              </div>
+
+              <!-- Heuristic Evidence Checklist -->
+              <div class="evidence-list-container">
+                <h3 class="evidence-heading">Signals &amp; Heuristics Evaluated:</h3>
+                <ul class="evidence-list" id="evidence-list">
+                  <li>Waiting for interaction telemetry upon form submission</li>
+                </ul>
+              </div>
+
+              <!-- Security Controls Status -->
+              <div style="margin-top: 10px;">
+                <h3 class="evidence-heading">Security Controls:</h3>
+                <div class="controls-grid">
+                  <div class="control-item-card">
+                    <div style="font-size: 10px; color: var(--bc-text-muted); font-weight: 700; text-transform: uppercase;">Honeypot</div>
+                    <strong id="card-ctrl-honeypot" style="color: var(--bc-success); font-size: 12px;">✓ Clean</strong>
+                  </div>
+                  <div class="control-item-card">
+                    <div style="font-size: 10px; color: var(--bc-text-muted); font-weight: 700; text-transform: uppercase;">Replay</div>
+                    <strong id="card-ctrl-replay" style="color: var(--bc-success); font-size: 12px;">✓ Protected</strong>
+                  </div>
+                  <div class="control-item-card">
+                    <div style="font-size: 10px; color: var(--bc-text-muted); font-weight: 700; text-transform: uppercase;">Challenge</div>
+                    <strong id="card-ctrl-challenge" style="color: var(--bc-text-muted); font-size: 12px;">— Not issued</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Progressive Disclosure: Raw Backend JSON -->
+              <details class="technical-details-fold" id="demo-technical-details" style="margin-top: 12px;">
+                <summary class="btn-technical-details">
+                  <span>View Technical Details</span>
+                  <span aria-hidden="true">&blacktriangledown;</span>
+                </summary>
+                
+                <div class="details-body" style="padding-top: 8px;">
+                  <details class="debug-json-fold" open>
+                    <summary>
+                      <span>Developer Details [ Raw JSON ]</span>
+                    </summary>
+                    <div style="padding-top: 6px;">
+                      <div style="display: flex; justify-content: flex-end; margin-bottom: 4px;">
+                        <button type="button" id="btn-copy-json" style="background: var(--bc-bg-surface); border: 1px solid var(--bc-border-subtle); padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;">Copy JSON</button>
+                      </div>
+                      <pre id="raw-json-inspector">{}</pre>
+                    </div>
+                  </details>
+                </div>
+              </details>
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+    
+      <!-- Accessibility Standards Highlights -->
+      <section class="a11y-standards-section" id="accessibility-doc-section" aria-labelledby="a11y-doc-heading">
+        <div class="paths-header">
+          <span class="paths-headline">Accessibility Guarantees</span>
+          <h2 class="card-title" id="a11y-doc-heading" style="margin-top: 4px; font-size: 1.1rem;">
+            Designed for Screen-Reader Compatibility &amp; WCAG 2.2 AA Target
+          </h2>
+        </div>
+
+        <div class="a11y-standards-grid">
+          <div class="a11y-feature-card">
+            <h3 class="a11y-feature-title">
+              <span aria-hidden="true">⌨️</span> Keyboard Operable
+            </h3>
+            <p class="a11y-feature-desc">
+              Complete Tab, Shift+Tab, Enter, and Space traversal with high-contrast 3px focus rings.
+            </p>
+          </div>
+
+          <div class="a11y-feature-card">
+            <h3 class="a11y-feature-title">
+              <span aria-hidden="true">🗣️</span> Live Regions (SC 4.1.2)
+            </h3>
+            <p class="a11y-feature-desc">
+              Status changes and prompts announced politely via <code>aria-live="polite"</code>.
+            </p>
+          </div>
+
+          <div class="a11y-feature-card">
+            <h3 class="a11y-feature-title">
+              <span aria-hidden="true">🎯</span> Predictable Focus
+            </h3>
+            <p class="a11y-feature-desc">
+              Focus shifts smoothly to challenge on activation and to submit button upon verification.
+            </p>
+          </div>
+
+          <div class="a11y-feature-card">
+            <h3 class="a11y-feature-title">
+              <span aria-hidden="true">🧩</span> Accessible Math (SC 3.3.8)
+            </h3>
+            <p class="a11y-feature-desc">
+              Cognitive-friendly arithmetic text without distorted graphics. Optional Web Speech readout.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Clean Footer -->
+    <footer class="citizen-footer" role="contentinfo">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <strong>BeyondCAPTCHA Prototype</strong>
+          <p>Smart India Hackathon Working Prototype &bull; Student Engineering Team</p>
+        </div>
+        <div class="footer-links">
+          <span>Target: WCAG 2.2 AA</span>
+          <span>&bull;</span>
+          <span>Data-Minimized Telemetry</span>
+          <span>&bull;</span>
+          <a href="/security-lab">Security Lab</a>
+          <span>&bull;</span>
+          <a href="/audit">Audit Logs</a>
+          <span>&bull;</span>
+          <a href="/embed-demo">Integration Demo</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/theme.js"></script>
+  <script src="/static/js/beyondcaptcha-widget.js"></script>
+  <script src="/static/js/demo.js"></script>
+</body>
+</html>
